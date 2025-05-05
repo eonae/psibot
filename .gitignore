@@ -1,0 +1,11 @@
+.mypy_cache
+.pytest_cache
+.env
+audio/*
+audio.src/*
+audio.wav/*
+__pycache__
+.vscode
+.tox
+cache
+

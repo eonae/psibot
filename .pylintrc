@@ -1,0 +1,20 @@
+[MASTER]
+load-plugins=pylint.extensions.docparams,pylint.extensions.docstyle
+
+[MESSAGES CONTROL]
+disable=C0111,C0103,C0303,W0311,W0603,W0621,R0903,R0913,R0914,R0915
+
+[FORMAT]
+max-line-length=100
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,fd
+
+[TYPECHECK]
+ignored-modules=numpy,tensorflow,torch
+
+[SIMILARITIES]
+min-similarity-lines=4
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes 
