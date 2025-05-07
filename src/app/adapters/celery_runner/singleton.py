@@ -1,8 +1,7 @@
 import asyncio
 import logging
 from celery import Celery  # type: ignore
-from celery.signals import worker_process_init  # type: ignore
-from dotenv import load_dotenv
+from celery.signals import worker_process_init, worker_ready  # type: ignore
 
 from src.app.adapters.celery_runner.tasks import (
     ConvertAudioToWavTask,
@@ -16,8 +15,6 @@ from src.app.adapters.celery_runner.tasks import (
 from src.app.config import Config
 
 logger = logging.getLogger(__name__)
-
-load_dotenv()
 
 config = Config()
 
@@ -51,8 +48,10 @@ celery_app.conf.update(
 )
 
 
+@worker_ready.connect
 @worker_process_init.connect
 def init_worker_loop(**_):
+    print("INITIALIZE WORKER LOOP")
     try:
         loop = asyncio.get_running_loop()
         print(f"Found existing event loop: {loop}")

@@ -18,8 +18,6 @@ from .templates import (
     MERGE_FAILED,
     POSTPROCESSING_COMPLETED,
     POSTPROCESSING_FAILED,
-    TRANSCRIBING_COMPLETED,
-    TRANSCRIBING_FAILED,
     TRANSCRIPTION_COMPLETED,
     TRANSCRIPTION_FAILED,
     TRANSCRIPTION_STARTED,
@@ -52,12 +50,6 @@ class TelegramNotifier(Notifier):
 
     async def notify_diarization_failed(self, user_id: int) -> None:
         await self.bot.send_message(user_id, DIARIZATION_FAILED)
-
-    async def notify_transcribing_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, TRANSCRIBING_COMPLETED)
-
-    async def notify_transcribing_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, TRANSCRIBING_FAILED)
 
     async def notify_merge_completed(self, user_id: int) -> None:
         await self.bot.send_message(user_id, MERGE_COMPLETED)

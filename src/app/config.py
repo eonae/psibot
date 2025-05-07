@@ -2,6 +2,10 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def _must_load(key: str) -> str:
     value = os.getenv(key)
@@ -36,6 +40,9 @@ class Config:
     YC_ACCESS_KEY_ID = _must_load("YC_ACCESS_KEY_ID")
     YC_SECRET_ACCESS_KEY = _must_load("YC_SECRET_ACCESS_KEY")
     YC_SPEECH_KIT_BUCKET_NAME = os.getenv("YC_SPEECH_KIT_BUCKET_NAME", "speech-kit-wav")
+
+    # OpenRouter ML
+    OPENROUTER_API_KEY = _must_load("OPENROUTER_API_KEY")
 
     # Директории
     AUDIO_DIR = Path(os.getenv("AUDIO_DIR", "audio"))

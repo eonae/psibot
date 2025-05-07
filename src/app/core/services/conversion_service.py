@@ -1,4 +1,5 @@
 import logging
+import tempfile
 from io import BytesIO
 from pathlib import Path
 
@@ -37,16 +38,20 @@ class ConversionService:
         # Читаем исходный файл
         audio_data = self.storage.read(source_filename)
 
-        # Загружаем аудио из байтов через BytesIO
-        # y - numpy массив с аудио данными (амплитуда звука)
-        # sr - частота дискретизации (количество сэмплов в секунду)
-        y, sr = librosa.load(BytesIO(audio_data), sr=SAMPLE_RATE)
+        with tempfile.NamedTemporaryFile(suffix=source_filename.suffix, delete=True) as tmp:
+            tmp.write(audio_data)
+            tmp.flush()  # обязательно, чтобы всё записалось на диск
 
-        # Сохраняем в WAV используя soundfile (sf) через BytesIO
-        buffer = BytesIO()
-        sf.write(buffer, y, sr)
-        buffer.seek(0)
+            print('TEMPORARY FILE:', tmp.name)
 
-        # Записываем через storage
-        self.storage.save(buffer.getvalue(), target_filename)
-        logger.info("✅ Conversion completed: %s", target_filename)
+            # Загружаем аудио из временного файла
+            y, sr = librosa.load(tmp.name, sr=SAMPLE_RATE)
+
+            # Сохраняем в WAV используя soundfile (sf) через BytesIO
+            buffer = BytesIO()
+            sf.write(buffer, y, sr)
+            buffer.seek(0)
+
+            # Записываем через storage
+            self.storage.save(buffer.getvalue(), target_filename)
+            logger.info("✅ Conversion completed: %s", target_filename)

@@ -60,6 +60,8 @@ class YandexSpeechKit(SpeechToText):
         logger.info("📦 Fetching recognition result: %s", operation_id)
         raw = self._get_recognition(operation_id)
 
+        print(json.dumps(raw, indent=4))
+
         return self._parse_results(raw)
 
     # https://yandex.cloud/ru/docs/speechkit/stt-v3/api-ref/AsyncRecognizer/recognizeFile
@@ -81,9 +83,14 @@ class YandexSpeechKit(SpeechToText):
                     "language_codes": ["en-EN"],
                 },
             },
-            "speaker_labeling": {
-                "speaker_labeling": "SPEAKER_LABELING_ENABLED",
-            },
+            # Эти настройки не добавляют никаких новых данных в результат,
+            # но если без них channelTag - всегда 0, то с ними speechkit
+            # пытается разделять. Проблема в том, что в результате дорожки
+            # накладываются друг на друга, и получается очень сложно обработать данные.
+            #
+            # "speaker_labeling": {
+            #     "speaker_labeling": "SPEAKER_LABELING_ENABLED",
+            # },
         }
 
         response = requests.post(url, headers=self.headers, json=data, timeout=10)

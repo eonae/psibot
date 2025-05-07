@@ -39,7 +39,7 @@ class HandleTranscriptionUseCase:
             raise error
 
     async def notify_failed(self, job: TranscriptionJob):
-        await self.notifier.notify_transcribing_failed(job.user_id)
+        await self.notifier.notify_transcription_failed(job.user_id)
 
     async def notify_completed(self, job: TranscriptionJob):
-        await self.notifier.notify_transcribing_completed(job.user_id)
+        await self.notifier.notify_transcription_completed(job.user_id)
