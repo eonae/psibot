@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 class HandleRejectionUseCase:
     def __init__(
         self,
-        job_repository: JobsRepository,
+        jobs: JobsRepository,
         responder: Responder,
     ) -> None:
-        self.job_repository = job_repository
+        self.jobs_repository = jobs
         self.responder = responder
 
     async def execute(self, user_id: int) -> None:
@@ -23,7 +23,7 @@ class HandleRejectionUseCase:
         logger.info("Handling rejection for user %s", user_id)
 
         # Получаем последнюю задачу пользователя
-        job = await self.job_repository.get_for_user_active(user_id)
+        job = await self.jobs_repository.get_for_user_active(user_id)
         if not job:
             logger.error("No job found for user %d", user_id)
             await self.responder.reply_no_jobs()
@@ -36,7 +36,7 @@ class HandleRejectionUseCase:
 
         # Обновляем статус задачи
         job.set_failed(Exception("User rejected the result"))
-        await self.job_repository.save(job)
+        await self.jobs_repository.save(job)
 
         # Отправляем уведомление пользователю
         await self.responder.reply_rejected()

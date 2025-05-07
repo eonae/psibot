@@ -1,10 +1,12 @@
-# infrastructure/tasks/async_task_base.py
-
 import asyncio
 import logging
 from abc import abstractmethod
 from typing import Coroutine
 from celery import Task  # type: ignore
+
+import nest_asyncio  # type: ignore
+
+nest_asyncio.apply()
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +30,8 @@ class SafeAsyncTask(Task):
             raise
 
     def _execute_async(self, coroutine: Coroutine):
-        try:
-            loop = asyncio.get_running_loop()
-            if loop.is_running():
-                logger.warning(
-                    "[%s] Active event loop, using run_until_complete (may hang)",
-                    self.name,
-                )
-            return loop.run_until_complete(coroutine)
-        except RuntimeError:
-            return asyncio.run(coroutine)
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(coroutine)
 
     @abstractmethod
     async def run_async(self, *args, **kwargs):

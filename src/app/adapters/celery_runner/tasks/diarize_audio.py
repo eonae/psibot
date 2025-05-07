@@ -1,8 +1,7 @@
-import asyncio
 from uuid import UUID
 
 from src.app.adapters.celery_runner.safe_async_base_task import SafeAsyncTask
-from src.app.adapters.db.singleton import jobs_repository
+from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.files.singleton import storage
 from src.app.adapters.ml import PyannoteDiarizer
 from src.app.adapters.telegram.singleton import bot
@@ -10,6 +9,8 @@ from src.app.adapters.telegram import TelegramNotifier
 from src.app.config import Config
 from src.app.core.services import DiarizationService
 from src.app.core.use_cases import HandleDiarizeUseCase
+
+diarizer = PyannoteDiarizer.from_config(Config())
 
 
 class DiarizeAudioTask(SafeAsyncTask):
@@ -27,15 +28,12 @@ class DiarizeAudioTask(SafeAsyncTask):
         """
         job_id = args[0]
 
-        diarizer = PyannoteDiarizer.from_config(Config())
-
         use_case = HandleDiarizeUseCase(
-            jobs_repository=jobs_repository,
+            jobs_repository=make_jobs_repository(),
             diarizer=DiarizationService(storage, diarizer),
             notifier=TelegramNotifier(bot),
         )
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(use_case.execute(UUID(job_id)))
+        await use_case.execute(UUID(job_id))
 
         return job_id

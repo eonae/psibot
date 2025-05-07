@@ -1,7 +1,7 @@
 from aiogram.types import Message, Voice  # type: ignore
 
 from src.app.adapters.celery_runner import CeleryRunner
-from src.app.adapters.db.singleton import jobs_repository
+from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.telegram import TelegramResponder
 from src.app.adapters.telegram.singleton import bot
 from src.app.core.models import InputFileDTO
@@ -17,7 +17,7 @@ async def handle_audio_file(message: Message) -> None:
 
     # Создаем use case
     use_case = HandleNewFileUseCase(
-        jobs=jobs_repository,
+        jobs=make_jobs_repository(),
         pipeline_runner=CeleryRunner(),
         responder=TelegramResponder(message, bot),
     )

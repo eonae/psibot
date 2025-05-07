@@ -26,12 +26,12 @@ class HandleMergingUseCase:
         job = await self.jobs_repository.get_one(job_id)
 
         try:
-            job.assert_is_processing()
+            job.to_postprocessing()
 
             self.merger.merge(
-                job.files.diarization,
-                job.files.transcription,
-                job.files.merged,
+                transcription_filename=job.files.transcription,
+                diarization_filename=job.files.diarization,
+                target_filename=job.files.merged,
             )
 
             await self.jobs_repository.save(job)

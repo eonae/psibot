@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from src.app.adapters.celery_runner.safe_async_base_task import SafeAsyncTask
-from src.app.adapters.db.singleton import jobs_repository
+from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.files.singleton import storage
 from src.app.adapters.ml import YandexSpeechKit
 from src.app.adapters.s3bucket import S3Bucket
@@ -33,7 +33,7 @@ class TranscribeAudioTask(SafeAsyncTask):
         )
 
         use_case = HandleTranscriptionUseCase(
-            jobs_repository=jobs_repository,
+            jobs_repository=make_jobs_repository(),
             transcriber=TranscriptionService(storage, stt),
             notifier=TelegramNotifier(bot),
         )

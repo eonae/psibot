@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from src.app.adapters.celery_runner.safe_async_base_task import SafeAsyncTask
-from src.app.adapters.db.singleton import jobs_repository
+from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.files.singleton import storage
 from src.app.adapters.telegram import TelegramNotifier
 from src.app.adapters.telegram.singleton import bot
@@ -25,7 +25,7 @@ class ConvertAudioToWavTask(SafeAsyncTask):
         job_id = args[0]
 
         use_case = HandleConvertUseCase(
-            jobs_repository=jobs_repository,
+            jobs_repository=make_jobs_repository(),
             converter=ConversionService(storage),
             notifier=TelegramNotifier(bot),
         )

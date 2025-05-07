@@ -41,7 +41,9 @@ class MergingService:
         transcription = self._load(transcription_filename, TranscriptionSegment)
         diarization = self._load(diarization_filename, DiarizationSegment)
 
-        merged = self._merge(transcription, diarization)
+        print(f"transcription: {transcription}")
+        print(f"diarization: {diarization}")
+        merged = self._merge(transcription=transcription, diarization=diarization)
         self.storage.save(str(merged).encode(), target_filename)
 
         logger.info("✅ Merging completed: %s", target_filename)

@@ -86,7 +86,7 @@ class TranscriptionJob:
     def _transition(self, status_from: JobStatus, status_to: JobStatus) -> None:
         if self.status != status_from:
             raise ValueError(
-                f"Job id={self.id} is can't transition to {status_to}"
+                f"Job id={self.id} is can't transition to {status_to}\n"
                 f"expected current status <{status_from}>, got <{self.status}>"
             )
 

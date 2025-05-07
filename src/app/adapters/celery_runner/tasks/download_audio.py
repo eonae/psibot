@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.app.adapters.db.singleton import jobs_repository
+from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.files.singleton import storage
 from src.app.adapters.telegram import TelegramFileLoader, TelegramNotifier
 from src.app.adapters.telegram.singleton import bot
@@ -24,7 +24,7 @@ class DownloadAudioTask(SafeAsyncTask):
         job_id = args[0]
 
         use_case = HandleDownloadUseCase(
-            jobs_repository=jobs_repository,
+            jobs_repository=make_jobs_repository(),
             loader=TelegramFileLoader(),
             storage=storage,
             notifier=TelegramNotifier(bot),

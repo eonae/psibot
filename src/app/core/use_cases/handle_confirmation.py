@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 class HandleConfirmationUseCase:
     def __init__(
         self,
-        job_repository: JobsRepository,
+        jobs: JobsRepository,
         file_storage: FileStorage,
         responder: Responder,
     ) -> None:
-        self.job_repository = job_repository
+        self.job_repository = jobs
         self.file_storage = file_storage
         self.responder = responder
 

@@ -24,7 +24,9 @@ class TranscriptionSegment(Segment):
     @classmethod
     def from_segment(cls, segment: Segment) -> "TranscriptionSegment":
         if not segment.text:
-            raise ValueError("Text is required in RecognitionResult")
+            raise ValueError("Text is required in TranscriptionSegment")
+
+        print(f"segment: {segment}")
 
         return TranscriptionSegment(
             start=segment.start,
