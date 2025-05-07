@@ -2,22 +2,22 @@ from .handle_confirmation import HandleConfirmationUseCase
 from .handle_new_file import HandleNewFileUseCase
 from .handle_rejection import HandleRejectionUseCase
 from .processing_pipeline import (
-    HandleConvertResultUseCase,
-    HandleDiarizationResultUseCase,
-    HandleDownloadResultUseCase,
-    HandleMergeResultUseCase,
-    HandlePostprocessingResultUseCase,
-    HandleTranscriptionResultUseCase,
+    HandleConvertUseCase,
+    HandleDiarizeUseCase,
+    HandleDownloadUseCase,
+    HandleMergingUseCase,
+    HandlePostprocessingUseCase,
+    HandleTranscriptionUseCase,
 )
 
 __all__ = [
     "HandleConfirmationUseCase",
     "HandleRejectionUseCase",
     "HandleNewFileUseCase",
-    "HandleDownloadResultUseCase",
-    "HandleConvertResultUseCase",
-    "HandleDiarizationResultUseCase",
-    "HandleMergeResultUseCase",
-    "HandlePostprocessingResultUseCase",
-    "HandleTranscriptionResultUseCase",
+    "HandleDownloadUseCase",
+    "HandleConvertUseCase",
+    "HandleDiarizeUseCase",
+    "HandleMergingUseCase",
+    "HandlePostprocessingUseCase",
+    "HandleTranscriptionUseCase",
 ]

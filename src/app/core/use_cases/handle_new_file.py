@@ -2,8 +2,7 @@ import logging
 from datetime import datetime
 
 from src.app.core.models import InputFileDTO, TranscriptionJob
-from src.app.core.models.transcription_job_status import JobStatus
-from src.app.core.ports import JobsRepository, Responder, TasksScheduler
+from src.app.core.ports import JobsRepository, Responder, PipelineRunner
 
 logger = logging.getLogger(__name__)
 
@@ -15,11 +14,11 @@ class HandleNewFileUseCase:
         self,
         jobs: JobsRepository,
         responder: Responder,
-        tasks_scheduler: TasksScheduler,
+        pipeline_runner: PipelineRunner,
     ):
         self.jobs = jobs
         self.responder = responder
-        self.tasks_scheduler = tasks_scheduler
+        self.pipeline_runner = pipeline_runner
 
     async def execute(self, user_id: int, input_file: InputFileDTO):
         mime_type = input_file.mime_type or "unknown"
@@ -54,14 +53,7 @@ class HandleNewFileUseCase:
             original_filename=original_filename,
         )
 
-        new_job.to_stage(JobStatus.DOWNLOADING)
-
-        self.tasks_scheduler.schedule(
-            task_name="download",
-            job_id=new_job.id,
-            file_id=file_id,
-            target_filename=str(new_job.files.wav),
-        )
+        self.pipeline_runner.run_pipeline(new_job.id)
 
         # Сохраняем состояние для задачи
         await self.jobs.save(new_job)

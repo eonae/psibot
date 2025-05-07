@@ -1,3 +1,3 @@
-from .di import jobs_repository
+from .singleton import RedisJobsRepository
 
-__all__ = ["jobs_repository"]
+__all__ = ["RedisJobsRepository"]

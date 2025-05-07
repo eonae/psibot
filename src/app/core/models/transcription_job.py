@@ -8,6 +8,7 @@ from .transcription_job_status import JobStatus
 
 @dataclass
 class Files:
+    original: Path
     wav: Path
     diarization: Path
     transcription: Path
@@ -23,7 +24,6 @@ class TranscriptionJob:
     status: JobStatus
     created_at: datetime
     updated_at: datetime
-
     files: Files
 
     _error: str | None = None
@@ -41,6 +41,7 @@ class TranscriptionJob:
         base_path = Path(f"{int(self.created_at.timestamp())}_{self.id}")
 
         self.files = Files(
+            original=base_path / f"original_{self.original_filename}",
             wav=base_path / "converted.wav",
             diarization=base_path / "diarization.txt",
             transcription=base_path / "transcription.txt",
@@ -55,19 +56,39 @@ class TranscriptionJob:
             JobStatus.REJECTED,
         ]
 
-    def to_stage(self, status: JobStatus) -> None:
-        self.status = status
-        self.updated_at = datetime.now()
+    def to_processing(self) -> None:
+        self._transition(JobStatus.DOWNLOADING, JobStatus.PROCESSING)
+
+    def to_postprocessing(self) -> None:
+        self._transition(JobStatus.PROCESSING, JobStatus.POSTPROCESSING)
+
+    def to_confirmation(self) -> None:
+        self._transition(JobStatus.POSTPROCESSING, JobStatus.PENDING_CONFIRMATION)
 
     def set_confirmed(self):
-        self.status = JobStatus.CONFIRMED
-        self.updated_at = datetime.now()
+        self._transition(JobStatus.PENDING_CONFIRMATION, JobStatus.CONFIRMED)
 
     def set_rejected(self):
-        self.status = JobStatus.REJECTED
-        self.updated_at = datetime.now()
+        self._transition(JobStatus.PENDING_CONFIRMATION, JobStatus.REJECTED)
+
+    def assert_is_processing(self) -> None:
+        if not self.status == JobStatus.PROCESSING:
+            raise ValueError(f"Job id={self.id} is not in processing status")
 
     def set_failed(self, error: Exception):
+        if not self.is_active():
+            raise ValueError(f"Job id={self.id} is not in active status")
+
         self.status = JobStatus.FAILED
         self._error = str(error)
+        self.updated_at = datetime.now()
+
+    def _transition(self, status_from: JobStatus, status_to: JobStatus) -> None:
+        if self.status != status_from:
+            raise ValueError(
+                f"Job id={self.id} is can't transition to {status_to}"
+                f"expected current status <{status_from}>, got <{self.status}>"
+            )
+
+        self.status = status_to
         self.updated_at = datetime.now()

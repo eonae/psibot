@@ -41,10 +41,10 @@ class TelegramNotifier(Notifier):
     async def notify_download_failed(self, user_id: int) -> None:
         await self.bot.send_message(user_id, DOWNLOAD_FAILED)
 
-    async def notify_convert_completed(self, user_id: int) -> None:
+    async def notify_conversion_completed(self, user_id: int) -> None:
         await self.bot.send_message(user_id, CONVERT_COMPLETED)
 
-    async def notify_convert_failed(self, user_id: int) -> None:
+    async def notify_conversion_failed(self, user_id: int) -> None:
         await self.bot.send_message(user_id, CONVERT_FAILED)
 
     async def notify_diarization_completed(self, user_id: int) -> None:

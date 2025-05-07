@@ -5,7 +5,7 @@ def main():
     subprocess.run(
         [
             "celery",
-            "-A", "src.app.adapters.my_celery.singleton",
+            "-A", "src.app.adapters.celery_runner.singleton",
             "worker",
             "-l", "DEBUG"
         ],

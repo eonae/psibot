@@ -1,5 +1,5 @@
 from .input_file_dto import InputFileDTO
-from .transcription_job import TranscriptionJob
+from .transcription_job import TranscriptionJob, Files
 from .transcription_job_status import JobStatus
 from .segments import (
     Segment,
@@ -13,6 +13,7 @@ from .segments import (
 )
 
 __all__ = [
+    "Files",
     "JobStatus",
     "TranscriptionJob",
     "InputFileDTO",

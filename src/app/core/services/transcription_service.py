@@ -2,7 +2,7 @@ import logging
 import tempfile
 from pathlib import Path
 
-from src.app.adapters.files import storage
+from src.app.adapters.files.singleton import storage
 from src.app.core.ports import FileStorage
 from src.app.core.ports.ml import SpeechToText
 

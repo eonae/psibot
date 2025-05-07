@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery  # type: ignore
 
-from src.app.adapters.db import jobs_repository
+from src.app.adapters.db.singleton import jobs_repository
 from src.app.adapters.telegram import TelegramResponder
 from src.app.adapters.telegram.singleton import bot
 from src.app.core.use_cases import HandleRejectionUseCase

@@ -1,15 +1,16 @@
-from .handle_download_result import HandleDownloadResultUseCase
-from .handle_convert_result import HandleConvertResultUseCase
-from .handle_diarization_result import HandleDiarizationResultUseCase
-from .handle_merge_result import HandleMergeResultUseCase
-from .handle_postprocessing_result import HandlePostprocessingResultUseCase
-from .handle_transcription_result import HandleTranscriptionResultUseCase
+from .handle_convert_use_case import HandleConvertUseCase
+from .handle_diarize_use_case import HandleDiarizeUseCase
+from .handle_download_use_case import HandleDownloadUseCase
+from .handle_merging_use_case import HandleMergingUseCase
+from .handle_postprocessing_use_case import HandlePostprocessingUseCase
+from .handle_transcription_use_case import HandleTranscriptionUseCase
+
 
 __all__ = [
-    "HandleDownloadResultUseCase",
-    "HandleConvertResultUseCase",
-    "HandleDiarizationResultUseCase",
-    "HandleMergeResultUseCase",
-    "HandlePostprocessingResultUseCase",
-    "HandleTranscriptionResultUseCase",
+    "HandleConvertUseCase",
+    "HandleDiarizeUseCase",
+    "HandleDownloadUseCase",
+    "HandleMergingUseCase",
+    "HandlePostprocessingUseCase",
+    "HandleTranscriptionUseCase",
 ]

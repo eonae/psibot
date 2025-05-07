@@ -8,10 +8,10 @@ class Notifier(Protocol):
     async def notify_download_failed(self, user_id: int) -> None:
         ...
 
-    async def notify_convert_completed(self, user_id: int) -> None:
+    async def notify_conversion_completed(self, user_id: int) -> None:
         ...
 
-    async def notify_convert_failed(self, user_id: int) -> None:
+    async def notify_conversion_failed(self, user_id: int) -> None:
         ...
 
     async def notify_diarization_completed(self, user_id: int) -> None:
@@ -30,9 +30,6 @@ class Notifier(Protocol):
         ...
 
     async def notify_merge_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_postprocessing_completed(self, user_id: int) -> None:
         ...
 
     async def notify_postprocessing_failed(self, user_id: int) -> None:
