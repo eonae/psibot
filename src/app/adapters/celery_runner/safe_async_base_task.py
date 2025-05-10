@@ -17,6 +17,7 @@ class SafeAsyncTask(Task):
     """
 
     soft_retry = True  # включить или выключить retry
+    max_retries = 3  # максимальное количество попыток
 
     def run(self, *args, **kwargs):
         """Синхронный вход, вызываемый Celery — исполняет async run_async"""
@@ -25,9 +26,15 @@ class SafeAsyncTask(Task):
             return self._execute_async(coroutine)
         except Exception as exc:
             logger.exception("[%s] Error executing task", self.name)
-            if self.soft_retry:
+            if self.soft_retry and not self.is_last_retry():
                 raise self.retry(exc=exc, countdown=5)
+            # Добавляем информацию о том, что это последняя попытка
+            exc.is_last_retry = True  # type: ignore
             raise
+
+    def is_last_retry(self) -> bool:
+        """Проверяет, является ли текущая попытка последней"""
+        return self.request.retries >= self.max_retries
 
     def _execute_async(self, coroutine: Coroutine):
         loop = asyncio.get_event_loop()

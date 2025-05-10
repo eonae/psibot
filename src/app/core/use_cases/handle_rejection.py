@@ -1,6 +1,6 @@
 import logging
 
-from src.app.core.ports import JobsRepository, Responder
+from src.app.core.ports import JobsRepository, Notifier, MessageType
 
 logger = logging.getLogger(__name__)
 
@@ -9,10 +9,10 @@ class HandleRejectionUseCase:
     def __init__(
         self,
         jobs: JobsRepository,
-        responder: Responder,
+        notifier: Notifier,
     ) -> None:
         self.jobs_repository = jobs
-        self.responder = responder
+        self.notifier = notifier
 
     async def execute(self, user_id: int) -> None:
         """Обрабатывает отклонение результатов транскрибации.
@@ -26,12 +26,12 @@ class HandleRejectionUseCase:
         job = await self.jobs_repository.get_for_user_active(user_id)
         if not job:
             logger.error("No job found for user %d", user_id)
-            await self.responder.reply_no_jobs()
+            await self.notifier.notify(user_id, MessageType.NO_JOBS)
             return
 
         if job.status != "pending_confirmation":
             logger.error("Job %s is not in pending_confirmation status", job.id)
-            await self.responder.reply_job_wrong_status()
+            await self.notifier.notify(user_id, MessageType.JOB_WRONG_STATUS)
             return
 
         # Обновляем статус задачи
@@ -39,6 +39,6 @@ class HandleRejectionUseCase:
         await self.jobs_repository.save(job)
 
         # Отправляем уведомление пользователю
-        await self.responder.reply_rejected()
+        await self.notifier.notify(user_id, MessageType.REJECTED)
 
         logger.info("Rejection handled for job %s", job.id)

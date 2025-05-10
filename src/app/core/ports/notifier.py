@@ -1,47 +1,13 @@
 from typing import Protocol
 
+from .message_types import MessageType
+
 
 class Notifier(Protocol):
-    async def notify_download_completed(self, user_id: int) -> None:
-        ...
-
-    async def notify_download_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_conversion_completed(self, user_id: int) -> None:
-        ...
-
-    async def notify_conversion_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_diarization_completed(self, user_id: int) -> None:
-        ...
-
-    async def notify_diarization_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_merge_completed(self, user_id: int) -> None:
-        ...
-
-    async def notify_merge_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_postprocessing_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_transcription_started(self, user_id: int) -> None:
-        ...
-
-    async def notify_transcription_failed(self, user_id: int) -> None:
-        ...
-
-    async def notify_transcription_completed(self, user_id: int) -> None:
+    async def notify(self, user_id: int, message_type: MessageType, **params) -> None:
         ...
 
     async def send_result_with_confirmation(
-        self, user_id: int, file: bytes, filename: str
+        self, user_id: int, file: bytes, filename: str, job_id: str
     ) -> None:
-        ...
-
-    async def notify_welcome(self, user_id: int) -> None:
         ...
