@@ -30,6 +30,6 @@ class MergeResultsTask(SafeAsyncTask):
             notifier=TelegramNotifier(bot),
         )
 
-        await use_case.execute(UUID(job_id))
+        await use_case.execute(UUID(job_id), self.is_last_retry())
 
         return job_id

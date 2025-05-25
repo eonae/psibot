@@ -5,7 +5,6 @@ from .handle_merging_use_case import HandleMergingUseCase
 from .handle_postprocessing_use_case import HandlePostprocessingUseCase
 from .handle_transcription_use_case import HandleTranscriptionUseCase
 
-
 __all__ = [
     "HandleConvertUseCase",
     "HandleDiarizeUseCase",

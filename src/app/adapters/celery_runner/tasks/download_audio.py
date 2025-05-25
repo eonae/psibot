@@ -2,8 +2,13 @@ from uuid import UUID
 
 from src.app.adapters.db.singleton import make_jobs_repository
 from src.app.adapters.files.singleton import storage
-from src.app.adapters.telegram import TelegramFileLoader, TelegramNotifier
+from src.app.adapters.loaders import (
+    GoogleDriveFileLoader,
+    TelegramFileLoader,
+    YandexDiskFileLoader,
+)
 from src.app.adapters.telegram.singleton import bot
+from src.app.adapters.telegram import TelegramNotifier
 from src.app.core.use_cases import HandleDownloadUseCase
 from src.app.adapters.celery_runner.safe_async_base_task import SafeAsyncTask
 
@@ -25,11 +30,15 @@ class DownloadAudioTask(SafeAsyncTask):
 
         use_case = HandleDownloadUseCase(
             jobs_repository=make_jobs_repository(),
-            loader=TelegramFileLoader(),
             storage=storage,
             notifier=TelegramNotifier(bot),
+            loaders=[
+                TelegramFileLoader(),
+                GoogleDriveFileLoader(),
+                YandexDiskFileLoader(),
+            ],
         )
 
-        await use_case.execute(UUID(job_id))
+        await use_case.execute(UUID(job_id), self.is_last_retry())
 
         return job_id

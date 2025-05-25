@@ -2,22 +2,22 @@ import logging
 from datetime import datetime
 
 from src.app.core.models import InputFileDTO, TranscriptionJob
-from src.app.core.ports import JobsRepository, Responder, PipelineRunner
+from src.app.core.ports import JobsRepository, Notifier, PipelineRunner, MessageType
 
 logger = logging.getLogger(__name__)
 
-MAX_FILE_SIZE = 50 * 1024 * 1024
+MAX_FILE_SIZE = 20 * 1024 * 1024
 
 
 class HandleNewFileUseCase:
     def __init__(
         self,
         jobs: JobsRepository,
-        responder: Responder,
+        notifier: Notifier,
         pipeline_runner: PipelineRunner,
     ):
         self.jobs = jobs
-        self.responder = responder
+        self.notifier = notifier
         self.pipeline_runner = pipeline_runner
 
     async def execute(self, user_id: int, input_file: InputFileDTO):
@@ -34,15 +34,20 @@ class HandleNewFileUseCase:
         logger.info("File mime_type: %s", mime_type)
 
         if not mime_type.startswith("audio/"):
-            await self.responder.reply_wrong_mime_type(mime_type)
+            await self.notifier.notify(user_id, MessageType.WRONG_MIME_TYPE, mime_type=mime_type)
             return
 
         if size is None:
-            await self.responder.reply_file_size_missing()
+            await self.notifier.notify(user_id, MessageType.FILE_SIZE_MISSING)
             return
 
         if size > MAX_FILE_SIZE:
-            await self.responder.reply_file_size_too_large(MAX_FILE_SIZE, size)
+            await self.notifier.notify(
+                user_id,
+                MessageType.FILE_SIZE_TOO_LARGE,
+                max_size=MAX_FILE_SIZE,
+                size=size,
+            )
             return
 
         logger.info("Creating new job for user %s", user_id)
@@ -58,4 +63,4 @@ class HandleNewFileUseCase:
         # Сохраняем состояние для задачи
         await self.jobs.save(new_job)
 
-        await self.responder.reply_file_is_downloading()
+        await self.notifier.notify(user_id, MessageType.FILE_IS_DOWNLOADING)

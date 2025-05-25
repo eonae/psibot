@@ -1,84 +1,21 @@
-from aiogram import Bot  # type: ignore
-from aiogram.types import (  # type: ignore
-    BufferedInputFile,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-)
+from aiogram import Bot
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.app.core.ports import Notifier
-
-from .templates import (
-    CONVERT_COMPLETED,
-    CONVERT_FAILED,
-    DIARIZATION_COMPLETED,
-    DIARIZATION_FAILED,
-    DOWNLOAD_COMPLETED,
-    DOWNLOAD_FAILED,
-    MERGE_COMPLETED,
-    MERGE_FAILED,
-    POSTPROCESSING_COMPLETED,
-    POSTPROCESSING_FAILED,
-    TRANSCRIPTION_COMPLETED,
-    TRANSCRIPTION_FAILED,
-    TRANSCRIPTION_STARTED,
-    WELCOME_MESSAGE,
-)
+from src.app.core.ports import Message, MessageType, Notifier
+from .message_handler import TelegramMessageHandler
 
 
 class TelegramNotifier(Notifier):
     def __init__(self, bot: Bot) -> None:
-        self.bot = bot
+        self.handler = TelegramMessageHandler(bot)
 
-    async def notify_welcome(self, user_id: int) -> None:
-        """Отправляет приветственное сообщение"""
-        await self.bot.send_message(user_id, WELCOME_MESSAGE)
-
-    async def notify_download_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, DOWNLOAD_COMPLETED)
-
-    async def notify_download_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, DOWNLOAD_FAILED)
-
-    async def notify_conversion_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, CONVERT_COMPLETED)
-
-    async def notify_conversion_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, CONVERT_FAILED)
-
-    async def notify_diarization_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, DIARIZATION_COMPLETED)
-
-    async def notify_diarization_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, DIARIZATION_FAILED)
-
-    async def notify_merge_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, MERGE_COMPLETED)
-
-    async def notify_merge_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, MERGE_FAILED)
-
-    async def notify_postprocessing_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, POSTPROCESSING_COMPLETED)
-
-    async def notify_postprocessing_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, POSTPROCESSING_FAILED)
-
-    async def notify_transcription_started(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, TRANSCRIPTION_STARTED)
-
-    async def notify_transcription_failed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, TRANSCRIPTION_FAILED)
-
-    async def notify_transcription_completed(self, user_id: int) -> None:
-        await self.bot.send_message(user_id, TRANSCRIPTION_COMPLETED)
+    async def notify(self, user_id: int, message_type: MessageType, **params) -> None:
+        message = Message(message_type, params)
+        await self.handler.send_message(user_id, message)
 
     async def send_result_with_confirmation(
-        self, user_id: int, file: bytes, filename: str
+        self, user_id: int, file: bytes, filename: str, job_id: str
     ) -> None:
-        caption = (
-            "✅ Обработка завершена! Проверьте результат и подтвердите сохранение:"
-        )
-        # Отправляем клавиатуру с подтверждением
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -90,10 +27,15 @@ class TelegramNotifier(Notifier):
             ]
         )
 
-        # Отправляем файл с результатом
-        await self.bot.send_document(
+        message = Message(
+            MessageType.TRANSCRIPTION_COMPLETED,
+            {"job_id": job_id},
+        )
+
+        await self.handler.send_document(
             user_id,
-            document=BufferedInputFile(file, filename=filename),
-            caption=caption,
+            file,
+            filename,
+            message,
             reply_markup=keyboard,
         )

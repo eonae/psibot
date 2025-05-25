@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
+import logging
 from pathlib import Path
 from uuid import UUID, uuid4
 
 from .transcription_job_status import JobStatus
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -20,7 +23,7 @@ class TranscriptionJob:
     id: UUID
     user_id: int
     file_id: str
-    original_filename: str
+    original_filename: str | None
     status: JobStatus
     created_at: datetime
     updated_at: datetime
@@ -28,7 +31,7 @@ class TranscriptionJob:
 
     _error: str | None = None
 
-    def __init__(self, user_id: int, file_id: str, original_filename: str):
+    def __init__(self, user_id: int, file_id: str, original_filename: str | None):
         self.user_id = user_id
         self.file_id = file_id
         self.original_filename = original_filename
@@ -41,7 +44,7 @@ class TranscriptionJob:
         base_path = Path(f"{int(self.created_at.timestamp())}_{self.id}")
 
         self.files = Files(
-            original=base_path / f"original_{self.original_filename}",
+            original=base_path / f"original_{self.original_filename or 'file'}",
             wav=base_path / "converted.wav",
             diarization=base_path / "diarization.txt",
             transcription=base_path / "transcription.txt",
@@ -56,8 +59,18 @@ class TranscriptionJob:
             JobStatus.REJECTED,
         ]
 
-    def to_processing(self) -> None:
+    def to_processing(self, filename: str | None = None) -> None:
         self._transition(JobStatus.DOWNLOADING, JobStatus.PROCESSING)
+
+        if not self.original_filename:
+            self.original_filename = Path(filename or f"{uuid4()}.maybe_audio").name
+
+        elif filename and self.original_filename != filename:
+            logger.warning(
+                "File name mismatch: %s != %s (from content-disposition)",
+                self.original_filename,
+                filename,
+            )
 
     def to_postprocessing(self) -> None:
         self._transition(JobStatus.PROCESSING, JobStatus.POSTPROCESSING)

@@ -64,12 +64,10 @@ class MergingService:
                 to_append = t_segment.with_speaker(d_segment.speaker)
                 break
 
-            if to_append:
-                merged.append(to_append)
-            else:
-                raise ValueError(
-                    f"Не удалось найти подходящий сегмент диаризации для {t_segment}"
-                )
+            if not to_append:
+                to_append = t_segment.with_speaker("SPEAKER_XX")
+
+            merged.append(to_append)
 
         return merged
 

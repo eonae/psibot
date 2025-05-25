@@ -10,8 +10,6 @@ packages = [{include = "src"}]
 test = "pytest:main"
 main = "src.app.entrypoints.main:run_main_async"
 worker = "src.app.entrypoints.worker:main"
-recognize = "src.cli.cli_recognize:main"
-diarize = "src.cli.cli_diarize:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -28,6 +26,7 @@ celery = "^5.3.0"
 redis = "^4.5.0"
 nest-asyncio = "^1.6.0"
 openai = "^1.77.0"
+gdown = "^5.2.0"
 
 [tool.poetry.group.dev.dependencies]
 types-requests = "^2.32.0"

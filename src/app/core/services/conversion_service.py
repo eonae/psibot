@@ -1,18 +1,12 @@
 import logging
+import subprocess
 import tempfile
-from io import BytesIO
 from pathlib import Path
-
-import librosa
-import soundfile as sf  # type: ignore
 
 from src.app.core.ports import FileStorage
 from src.shared.logging import log_time
 
 logger = logging.getLogger(__name__)
-
-# Частота дискретизации для WAV файлов
-SAMPLE_RATE = 16000
 
 
 class ConversionService:
@@ -38,20 +32,37 @@ class ConversionService:
         # Читаем исходный файл
         audio_data = self.storage.read(source_filename)
 
-        with tempfile.NamedTemporaryFile(suffix=source_filename.suffix, delete=True) as tmp:
-            tmp.write(audio_data)
-            tmp.flush()  # обязательно, чтобы всё записалось на диск
+        ext = source_filename.suffix
 
-            print('TEMPORARY FILE:', tmp.name)
+        with (
+            tempfile.NamedTemporaryFile(suffix=ext, delete=True) as input_tmp,
+            tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as output_tmp,
+        ):
 
-            # Загружаем аудио из временного файла
-            y, sr = librosa.load(tmp.name, sr=SAMPLE_RATE)
+            # Записываем входной файл
+            input_tmp.write(audio_data)
+            input_tmp.flush()
 
-            # Сохраняем в WAV используя soundfile (sf) через BytesIO
-            buffer = BytesIO()
-            sf.write(buffer, y, sr)
-            buffer.seek(0)
+            # Запускаем ffmpeg для конвертации
+            cmd = [
+                "ffmpeg", "-y",  # Перезаписывать выходной файл если существует
+                "-i", input_tmp.name,  # Входной файл
+                "-acodec", "pcm_s16le",  # Кодек для WAV
+                "-ar", "16000",  # Частота дискретизации
+                "-ac", "1",  # Моно
+                output_tmp.name,  # Выходной файл
+            ]
 
-            # Записываем через storage
-            self.storage.save(buffer.getvalue(), target_filename)
+            try:
+                subprocess.run(cmd, check=True, capture_output=True, text=True)
+            except subprocess.CalledProcessError as e:
+                logger.error("FFmpeg error: %s", e.stderr)
+
+                raise RuntimeError(f"Failed to convert audio: {e.stderr}") from e
+
+            # Читаем результат и сохраняем
+            with open(output_tmp.name, "rb") as f:
+                wav_data = f.read()
+
+            self.storage.save(wav_data, target_filename)
             logger.info("✅ Conversion completed: %s", target_filename)
