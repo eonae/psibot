@@ -1,0 +1,37 @@
+version: "3"
+
+tasks:
+  run:infra:
+    desc: "Start infrastructure"
+    cmds:
+      - docker compose -f docker-compose.infra.yaml up
+
+  run:miniapp:
+    desc: "Run miniapp"
+    dir: "services/miniapp"
+    cmds:
+      - npm run dev
+
+  run:main:
+    desc: "Run main"
+    dir: "services/server"
+    cmds:
+      - poetry run main
+
+  run:worker-1:
+    desc: "Run worker 1"
+    dir: "services/server"
+    cmds:
+      - poetry run worker worker_1
+
+  run:worker-2:
+    desc: "Run worker 2"
+    dir: "services/server"
+    cmds:
+      - poetry run worker worker_2
+
+  run:flower:
+    desc: "Run celery UI"
+    dir: "services/server"
+    cmds:
+      - celery -A src.app.adapters.celery_runner.singleton:celery_app flower
