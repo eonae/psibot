@@ -1,8 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .app {
   width: 100%;
   margin: 0 auto;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: #f5f7fa;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .logo {
@@ -75,30 +89,59 @@ button:focus-visible {
 .user-profile {
   width: 100%;
   background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
 }
 
 .user-profile h2 {
-  margin: 0 0 20px;
-  color: #333;
-  font-size: 24px;
+  margin: 0 0 24px;
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.user-profile h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: #646cff;
+  border-radius: 2px;
 }
 
 .user-info {
   display: grid;
-  gap: 12px;
+  gap: 16px;
 }
 
 .user-info p {
   margin: 0;
   font-size: 16px;
-  color: #666;
+  color: #4a4a4a;
+  padding: 12px 16px;
+  background: #f8f9fc;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.user-info p:hover {
+  background: #f0f2f8;
 }
 
 .user-info strong {
-  color: #333;
+  color: #1a1a1a;
   margin-right: 8px;
+  font-weight: 600;
 }
