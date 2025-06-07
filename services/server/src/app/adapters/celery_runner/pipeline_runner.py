@@ -20,10 +20,8 @@ class CeleryRunner(PipelineRunner):
     _merge_task = celery_app.tasks["merge"]
     _postprocess_task = celery_app.tasks["postprocess"]
 
-    def run_pipeline(self, job_id: UUID) -> None:
-        pipeline = chain(
-            self._download_task.s(str(job_id)),
-            self._convert_task.s(),
+    def run_pipeline(self, job_id: UUID, should_download: bool = True) -> None:
+        rest_tasks = [
             chord(
                 [
                     self._diarize_task.s(),
@@ -32,6 +30,12 @@ class CeleryRunner(PipelineRunner):
                 self._merge_task.s(),
             ),
             self._postprocess_task.s(),
+        ]
+
+        first_tasks = (
+            [self._download_task.s(str(job_id)), self._convert_task.s()]
+            if should_download
+            else [self._convert_task.s(str(job_id))]
         )
 
-        pipeline.apply_async()
+        chain(*(first_tasks + rest_tasks)).apply_async()

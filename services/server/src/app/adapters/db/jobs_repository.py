@@ -8,7 +8,8 @@ from pathlib import Path
 from uuid import UUID
 
 from redis.asyncio import Redis  # type: ignore
-from src.app.core.models import Files, JobStatus, TranscriptionJob
+from src.app.core.models import Paths, JobStatus, TranscriptionJob
+from src.app.core.models.transcription_job import FileSource, SourceType
 from src.app.core.ports import JobsRepository
 
 
@@ -74,18 +75,21 @@ class RedisJobsRepository(JobsRepository):
             {
                 "id": str(job.id),
                 "user_id": job.user_id,
-                "file_id": job.file_id,
+                "source": {
+                    "type": job.source.type.value,
+                    "value": job.source.value,
+                },
                 "original_filename": job.original_filename,
                 "status": job.status.value,
                 "created_at": job.created_at.isoformat(),
                 "updated_at": job.updated_at.isoformat(),
                 "files": {
-                    "original": str(job.files.original),
-                    "wav": str(job.files.wav),
-                    "diarization": str(job.files.diarization),
-                    "transcription": str(job.files.transcription),
-                    "merged": str(job.files.merged),
-                    "postprocessed": str(job.files.postprocessed),
+                    "original": str(job.paths.original),
+                    "wav": str(job.paths.wav),
+                    "diarization": str(job.paths.diarization),
+                    "transcription": str(job.paths.transcription),
+                    "merged": str(job.paths.merged),
+                    "postprocessed": str(job.paths.postprocessed),
                 },
                 "error": job._error,  # pylint: disable=protected-access
             }
@@ -97,7 +101,10 @@ class RedisJobsRepository(JobsRepository):
         # Создаем базовый объект
         job = TranscriptionJob(
             user_id=job_data["user_id"],
-            file_id=job_data["file_id"],
+            source=FileSource(
+                type=SourceType(job_data["source"]["type"]),
+                value=job_data["source"]["value"],
+            ),
             original_filename=job_data["original_filename"],
         )
 
@@ -106,7 +113,7 @@ class RedisJobsRepository(JobsRepository):
         job.status = JobStatus(job_data["status"])
         job.created_at = datetime.fromisoformat(job_data["created_at"])
         job.updated_at = datetime.fromisoformat(job_data["updated_at"])
-        job.files = Files(
+        job.paths = Paths(
             original=Path(job_data["files"]["original"]),
             wav=Path(job_data["files"]["wav"]),
             diarization=Path(job_data["files"]["diarization"]),
