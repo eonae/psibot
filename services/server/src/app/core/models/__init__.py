@@ -11,11 +11,11 @@ from .segments import (
     TranscriptionSegment,
     TranscriptionSegmentWithSpeaker,
 )
-from .transcription_job import Files, TranscriptionJob
+from .transcription_job import Paths, TranscriptionJob
 from .transcription_job_status import JobStatus
 
 __all__ = [
-    "Files",
+    "Paths",
     "JobStatus",
     "TranscriptionJob",
     "InputFileDTO",

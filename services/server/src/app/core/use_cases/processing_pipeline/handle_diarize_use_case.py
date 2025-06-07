@@ -27,7 +27,7 @@ class HandleDiarizeUseCase:
         try:
             job.assert_is_processing()
 
-            self.diarizer.diarize(job.files.wav, job.files.diarization)
+            self.diarizer.diarize(job.paths.wav, job.paths.diarization)
 
             await self.notify_completed(job)
         except Exception as error:

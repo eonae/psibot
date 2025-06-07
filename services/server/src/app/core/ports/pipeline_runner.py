@@ -11,5 +11,5 @@ class PipelineRunner(Protocol):
     Интерфейс для запуска пайплайна обработки.
     """
 
-    def run_pipeline(self, job_id: UUID) -> None:  # type: ignore
+    def run_pipeline(self, job_id: UUID, should_download: bool) -> None:  # type: ignore
         """Запускает пайплайн обработки по ID задачи."""

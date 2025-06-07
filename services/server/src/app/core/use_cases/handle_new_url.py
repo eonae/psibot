@@ -6,6 +6,7 @@ import logging
 from urllib.parse import urlparse
 
 from src.app.core.models import TranscriptionJob
+from src.app.core.models.transcription_job import FileSource, SourceType
 from src.app.core.ports import JobsRepository, MessageType, Notifier, PipelineRunner
 
 logger = logging.getLogger(__name__)
@@ -44,13 +45,16 @@ class HandleNewUrlUseCase:
 
         new_job = TranscriptionJob(
             user_id=user_id,
-            file_id=url,
+            source=FileSource(
+                type=SourceType.UPLOAD_URL,
+                value=url,
+            ),
             original_filename=None,
         )
 
         # Сохраняем состояние для задачи
         await self.jobs.save(new_job)
 
-        self.pipeline_runner.run_pipeline(new_job.id)
+        self.pipeline_runner.run_pipeline(new_job.id, should_download=True)
 
         await self.notifier.notify(user_id, MessageType.FILE_IS_DOWNLOADING)

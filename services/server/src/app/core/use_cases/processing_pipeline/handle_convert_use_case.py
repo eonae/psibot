@@ -26,7 +26,7 @@ class HandleConvertUseCase:
 
         try:
             job.assert_is_processing()
-            self.converter.convert_to_wav(job.files.original, job.files.wav)
+            self.converter.convert_to_wav(job.paths.original, job.paths.wav)
 
             await self.notify_completed(job)
         except Exception as error:

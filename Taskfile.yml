@@ -1,36 +1,46 @@
 version: "3"
 
 tasks:
-  run:infra:
+  venv:
+    desc: "Create venv"
+    cmds:
+      - source services/server/.venv/bin/activate
+
+  infra:up:
     desc: "Start infrastructure"
     cmds:
-      - docker compose -f docker-compose.infra.yaml up
+      - docker compose -f docker-compose.infra.yaml up -d
 
-  run:miniapp:
+  infra:down:
+    desc: "Start infrastructure"
+    cmds:
+      - docker compose -f docker-compose.infra.yaml down
+
+  start:miniapp:
     desc: "Run miniapp"
     dir: "services/miniapp"
     cmds:
       - npm run dev
 
-  run:main:
+  start:main:
     desc: "Run main"
     dir: "services/server"
     cmds:
       - poetry run main
 
-  run:worker-1:
+  start:worker-1:
     desc: "Run worker 1"
     dir: "services/server"
     cmds:
       - poetry run worker worker_1
 
-  run:worker-2:
+  start:worker-2:
     desc: "Run worker 2"
     dir: "services/server"
     cmds:
       - poetry run worker worker_2
 
-  run:flower:
+  start:flower:
     desc: "Run celery UI"
     dir: "services/server"
     cmds:

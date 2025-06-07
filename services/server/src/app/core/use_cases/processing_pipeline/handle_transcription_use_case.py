@@ -27,7 +27,7 @@ class HandleTranscriptionUseCase:
         try:
             job.assert_is_processing()
 
-            self.transcriber.transcribe(job.files.wav, job.files.transcription)
+            self.transcriber.transcribe(job.paths.wav, job.paths.transcription)
 
             await self.notify_completed(job)
         except Exception as error:
