@@ -28,9 +28,9 @@ class HandleMergingUseCase:
             job.to_postprocessing()
 
             self.merger.merge(
-                transcription_filename=job.files.transcription,
-                diarization_filename=job.files.diarization,
-                target_filename=job.files.merged,
+                transcription_filename=job.paths.transcription,
+                diarization_filename=job.paths.diarization,
+                target_filename=job.paths.merged,
             )
 
             await self.jobs_repository.save(job)

@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useEffect } from 'react';
-import { UserProfile } from './components/UserProfile';
+import { FileUpload } from './components/FileUpload';
 import './App.css';
 
 function App() {
@@ -14,7 +14,8 @@ function App() {
 
     return (
       <div className="app">
-        <UserProfile />
+        {/* <UserProfile /> */}
+        <FileUpload />
       </div>
     );
 }

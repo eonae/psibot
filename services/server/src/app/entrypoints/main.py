@@ -1,37 +1,41 @@
 """
-Входная точка для запуска бота.
+Входная точка для запуска бота и API сервера.
 """
 
 import asyncio
-import logging
-
+import threading
 from aiogram import Dispatcher  # type: ignore
-
-from src.app.adapters.telegram.handlers import router
+import uvicorn  # type: ignore
+from src.app.api.main import app
 from src.app.adapters.telegram.singleton import bot
-from src.shared.logging import setup_logging
-
-logger = logging.getLogger(__name__)
+from src.app.adapters.telegram.handlers import router
 
 
-async def main() -> None:
+def run_api_server():
     """
-    Запуск бота.
+    Запускает FastAPI сервер в отдельном потоке.
     """
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+        log_level="info",
+    )
 
-    # Настраиваем логирование
-    setup_logging(level=logging.DEBUG)
 
-    # Проверяем токен бота
-    logger.info("Checking bot token...")
-    if not bot.token:
-        logger.error("Bot token is not set!")
-        return
-
-    # Создаем диспетчер
+async def main():
+    """
+    Запускает бота и API сервер.
+    """
+    # Регистрируем обработчики
     dp = Dispatcher()
     dp.include_router(router)
 
+    # Запускаем API сервер в отдельном потоке
+    api_thread = threading.Thread(target=run_api_server, daemon=True)
+    api_thread.start()
+
+    # Запускаем бота
     await dp.start_polling(bot)
 
 

@@ -31,7 +31,7 @@ class HandlePostprocessingUseCase:
         try:
             job.to_confirmation()
 
-            self.postprocessor.postprocess(job.files.merged, job.files.postprocessed)
+            self.postprocessor.postprocess(job.paths.merged, job.paths.postprocessed)
 
             await self.jobs_repository.save(job)
             await self.notify_completed(job)
@@ -47,7 +47,7 @@ class HandlePostprocessingUseCase:
         await self.notifier.notify(job.user_id, MessageType.POSTPROCESSING_FAILED)
 
     async def notify_completed(self, job: TranscriptionJob):
-        file = self.storage.read(job.files.postprocessed)
+        file = self.storage.read(job.paths.postprocessed)
         if not job.original_filename:
             raise ValueError("Original filename is not set")
 

@@ -37,7 +37,7 @@ class TelegramNotifier(Notifier):
                 [
                     InlineKeyboardButton(
                         text="🌐 Открыть веб-приложение",
-                        web_app=WebAppInfo(url=config.WEBAPP_URL)
+                        web_app=WebAppInfo(url=config.WEBAPP_URL),
                     )
                 ]
             ]

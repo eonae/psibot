@@ -2,6 +2,7 @@
 Модель задачи распознавания.
 """
 
+from enum import Enum
 import logging
 from dataclasses import dataclass
 from datetime import datetime
@@ -13,8 +14,28 @@ from .transcription_job_status import JobStatus
 logger = logging.getLogger(__name__)
 
 
+class SourceType(Enum):
+    """
+    Тип источника файла.
+    """
+
+    DOWNLOADED_FILE_PATH = "downloaded_file_path"
+    UPLOAD_URL = "upload_url"
+    TELEGRAM_FILE_ID = "telegram_file_id"
+
+
 @dataclass
-class Files:
+class FileSource:
+    """
+    Источник файла.
+    """
+
+    type: SourceType
+    value: str
+
+
+@dataclass
+class Paths:
     """
     Файлы, связанные с задачей распознавания.
     """
@@ -34,18 +55,18 @@ class TranscriptionJob:
 
     id: UUID
     user_id: int
-    file_id: str
+    source: FileSource
     original_filename: str | None
     status: JobStatus
     created_at: datetime
     updated_at: datetime
-    files: Files
+    paths: Paths
 
     _error: str | None = None
 
-    def __init__(self, user_id: int, file_id: str, original_filename: str | None):
+    def __init__(self, user_id: int, source: FileSource, original_filename: str | None):
         self.user_id = user_id
-        self.file_id = file_id
+        self.source = source
         self.original_filename = original_filename
         self.status = JobStatus.DOWNLOADING
 
@@ -55,7 +76,7 @@ class TranscriptionJob:
 
         base_path = Path(f"{int(self.created_at.timestamp())}_{self.id}")
 
-        self.files = Files(
+        self.paths = Paths(
             original=base_path / f"original_{self.original_filename or 'file'}",
             wav=base_path / "converted.wav",
             diarization=base_path / "diarization.txt",
