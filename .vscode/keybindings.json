@@ -1,0 +1,12 @@
+[
+  {
+    "key": "ctrl+cmd+f",
+    "command": "black-formatter.format",
+    "when": "editorTextFocus && !editorReadonly && editorLangId == 'python'"
+  },
+  {
+    "key": "ctrl+cmd+l",
+    "command": "editor.action.organizeImports",
+    "when": "editorTextFocus && !editorReadonly && editorLangId == 'python'"
+  }
+]

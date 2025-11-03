@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "build": [
+      "{projectRoot}/src/**/*.{ts,tsx}",
+      "!{projectRoot}/**/*.{spec,test,test.e2e,spec.e2e}.ts",
+      "{projectRoot}/tsconfig.json",
+      "{projectRoot}/tsconfig.build.json",
+      "{projectRoot}/package.json"
+    ],
+    "lint": [
+      "{projectRoot}/src/**/*.{ts,tsx,js,json}",
+      "{projectRoot}/.eslint*",
+      "{projectRoot}/tsconfig*",
+      "{projectRoot}/package.json"
+    ]
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "lint"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "inputs": [
+        "build"
+      ],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "lint"
+      ]
+    }
+  }
+}

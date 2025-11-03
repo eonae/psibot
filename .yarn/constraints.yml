@@ -1,0 +1,39 @@
+typescript: 5.7.3
+
+"@types":
+  jest: ^29.5.10
+  node: 18.18.3
+
+"@rsdk":
+  '*': 6.0.0-next.14
+
+"@gosha":
+  '*': workspace:*
+
+"@nestjs":
+  common: ^10.0.0
+  core: ^10.0.0
+  testing: ^10.4.4
+  microservices: ^10.0.0
+  swagger: ^8.0.0
+
+reflect-metadata: ^0.1.14
+rxjs: ^7.8.1
+
+
+"@sinclair/typebox": ^0.34.9 # required by @rsdk/common
+grammy: ^1.37.0
+
+ioredis: ^5.4.1
+
+"@mcteam":
+  "*": "^2.5.0" 
+
+drizzle-orm: ^0.44.4
+zod: ^4.0.0
+
+fluent-ffmpeg: ^2.1.3
+form-data: ^4.0.4
+
+'@speechkit':
+  '*': workspace:*

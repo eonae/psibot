@@ -1,0 +1,39 @@
+{
+    "python.analysis.extraPaths": [
+        "/Users/sergeyaslanov/Library/Caches/pypoetry/virtualenvs/speechkit-*/lib/python3.9/site-packages",
+        "${workspaceFolder}/services/server"
+    ],
+    "python.defaultInterpreterPath": "/Users/sergeyaslanov/Library/Caches/pypoetry/virtualenvs/speechkit-*/bin/python",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportGeneralTypeIssues": "warning",
+        "reportMissingImports": "warning",
+        "reportMissingTypeStubs": "warning"
+    },
+    "mypy.dmypyExecutable": "/Users/sergeyaslanov/Library/Caches/pypoetry/virtualenvs/speechkit-774vzeLF-py3.13/bin/dmypy",
+    "mypy.extraArguments": [
+        "--ignore-missing-imports"
+    ],
+    "isort.args": ["--profile", "black"],
+    "python.sortImports.args": [
+        "--profile", "black"
+    ],
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": ["--line-length", "99"],
+    "python.linting.pylintArgs": ["--max-line-length=99"],
+    "python.linting.flake8Args": [
+        "--max-line-length=99",
+        "--config=${workspaceFolder}/services/server/.flake8"
+    ],
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.workspaceFolder": "${workspaceFolder}/services/server",
+    "editor.rulers": [99],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "cSpell.words": [
+        "envlist",
+        "usedevelop"
+    ],
+} 

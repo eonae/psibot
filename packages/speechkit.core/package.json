@@ -1,0 +1,17 @@
+{
+  "name": "@speechkit/core",
+  "version": "0.1.0",
+  "private": true,
+  "license": "ISC",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "run -T eslint 'src/**/*.ts'",
+    "lint:fix": "yarn lint --fix",
+    "test": "run -T jest --passWithNoTests --detectOpenHandles",
+    "build": "yarn clean && run -T tsc",
+    "clean": "run -T rimraf dist/ node_modules/"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.19"
+  }
+}

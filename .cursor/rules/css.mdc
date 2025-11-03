@@ -1,0 +1,6 @@
+---
+globs: *.css
+alwaysApply: false
+---
+
+Никогда не используй с `!important` - это грязно!

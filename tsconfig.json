@@ -1,0 +1,6 @@
+{
+  "extends": "@mcteam/tsconfig.node/tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": false,
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "./src/**/*.ts"
+, "../../packages/speechkit.core/src/stt.interface.ts", "../../packages/speechkit.core/src/transcription-result.class.ts", "../../packages/speechkit.yandex/src/yandex-speechkit.adapter.ts"  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "."
+  }
+}
+

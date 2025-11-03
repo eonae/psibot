@@ -1,0 +1,6 @@
+---
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+
+Никогда не используй localStorage напрямую - используй хук useLocalStorage

@@ -1,0 +1,6 @@
+---
+description: Работа с контрактами
+alwaysApply: false
+---
+
+Всегда в контрактах используем nullish(), а не optional() или nullable()

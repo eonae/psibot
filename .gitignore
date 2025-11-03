@@ -1,11 +1,11 @@
-.mypy_cache
-.pytest_cache
 .env
 server/audio/*
 server/audio.src/*
 server/audio.wav/*
-__pycache__
-.vscode
-.tox
-cache
 
+node_modules
+
+.yarn/cache
+.nx
+
+**/dist
