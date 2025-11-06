@@ -13,7 +13,7 @@ import {
 } from './adapters/loaders';
 import { LocalFileStorage, S3Bucket } from './adapters/storage';
 import { TelegramNotifier } from './adapters/telegram/telegram.notifier';
-import { MergingService, PostprocessingService } from './core/services';
+import { PostprocessingService } from './core/services';
 import { buildActivities } from './activities';
 import { Config } from './config';
 
@@ -54,7 +54,6 @@ async function run(): Promise<void> {
   ];
 
   const llm = new OpenRouterAdapter(config.OPENROUTER_API_KEY);
-  const mergingService = new MergingService(storage);
   const postprocessor = new PostprocessingService(storage, llm);
 
   const bot = new Bot(config.TELEGRAM_BOT_TOKEN);
@@ -64,7 +63,6 @@ async function run(): Promise<void> {
     loaders,
     storage,
     sttProviders,
-    mergingService,
     postprocessor,
     notifier,
   });

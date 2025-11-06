@@ -28,24 +28,12 @@ tasks:
 
   start:main:
     desc: "Run main"
-    dir: "services/server"
+    dir: "apps/server"
     cmds:
-      - poetry run main
+      - yarn dev
 
-  start:worker-1:
-    desc: "Run worker 1"
-    dir: "services/server"
+  start:worker:
+    desc: "Run worker"
+    dir: "apps/server"
     cmds:
-      - poetry run worker worker_1
-
-  start:worker-2:
-    desc: "Run worker 2"
-    dir: "services/server"
-    cmds:
-      - poetry run worker worker_2
-
-  start:flower:
-    desc: "Run celery UI"
-    dir: "services/server"
-    cmds:
-      - celery -A src.app.adapters.celery_runner.singleton:celery_app flower
+        - yarn worker

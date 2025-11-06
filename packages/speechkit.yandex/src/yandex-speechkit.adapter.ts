@@ -1,27 +1,30 @@
 /* eslint-disable no-console */
 
+import { delay, Timespan } from '@rsdk/common';
 import type { SpeechToText, TranscriptionSegment } from '@speechkit/core';
 import { TranscriptionResult } from '@speechkit/core';
+import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 
 const STT_BASE_URL = 'https://stt.api.cloud.yandex.net/stt/v3';
 const OPERATIONS_BASE_URL = 'https://operation.api.cloud.yandex.net/operations';
-const POLLING_INTERVAL = 5000; // 5 seconds
+const POLLING_INTERVAL = new Timespan(5, 's');
+const HTTP_TIMEOUT = new Timespan(10, 's');
+
+export interface S3Bucket {
+  upload(path: string, key: string): Promise<void>;
+  getPresignedUrl(key: string): Promise<string>;
+}
 
 export class YandexSpeechKitAdapter implements SpeechToText {
-  private apiKey: string;
-  private bucket: any; // Will be properly typed when S3Bucket is implemented
+  private operationsApi: AxiosInstance;
+  private sttApi: AxiosInstance;
+  private bucket: S3Bucket;
 
-  constructor(apiKey: string, bucket: any) {
-    this.apiKey = apiKey;
+  constructor(apiKey: string, bucket: S3Bucket) {
+    this.operationsApi = this.makeClient(OPERATIONS_BASE_URL, apiKey);
+    this.sttApi = this.makeClient(STT_BASE_URL, apiKey);
     this.bucket = bucket;
-  }
-
-  private getHeaders(): Record<string, string> {
-    return {
-      Authorization: `Api-Key ${this.apiKey}`,
-      'Content-Type': 'application/json',
-    };
   }
 
   async transcribe(audioPath: string): Promise<TranscriptionResult> {
@@ -47,7 +50,7 @@ export class YandexSpeechKitAdapter implements SpeechToText {
       }
 
       console.log(`⏳ Waiting for operation result: ${operationId}`);
-      await this.sleep(POLLING_INTERVAL);
+      await delay(POLLING_INTERVAL);
     }
 
     console.log(`📦 Fetching recognition result: ${operationId}`);
@@ -57,7 +60,6 @@ export class YandexSpeechKitAdapter implements SpeechToText {
   }
 
   private async recognizeFileAsync(s3Url: string): Promise<string> {
-    const url = `${STT_BASE_URL}/recognizeFileAsync`;
     const data = {
       uri: s3Url,
       recognition_model: {
@@ -75,33 +77,20 @@ export class YandexSpeechKitAdapter implements SpeechToText {
       },
     };
 
-    const response = await axios.post(url, data, {
-      headers: this.getHeaders(),
-      timeout: 10_000,
-    });
+    const response = await this.sttApi.post('/recognizeFileAsync', data);
 
     return response.data.id;
   }
 
   private async getOperationStatus(operationId: string): Promise<boolean> {
-    const url = `${OPERATIONS_BASE_URL}/${operationId}`;
+    const { data } = await this.operationsApi.get(operationId);
 
-    const response = await axios.get(url, {
-      headers: this.getHeaders(),
-      timeout: 10_000,
-    });
-
-    return response.data.done;
+    return data.done;
   }
 
   private async getRecognition(operationId: string): Promise<any[]> {
-    const url = `${STT_BASE_URL}/getRecognition`;
-    const params = { operation_id: operationId };
-
-    const response = await axios.get(url, {
-      headers: this.getHeaders(),
-      params,
-      timeout: 10_000,
+    const response = await this.sttApi.get('/getRecognition', {
+      params: { operation_id: operationId },
       responseType: 'stream',
     });
 
@@ -110,15 +99,17 @@ export class YandexSpeechKitAdapter implements SpeechToText {
     for await (const chunk of response.data) {
       const lines = chunk.toString().split('\n');
       for (const line of lines) {
-        if (line.trim()) {
-          try {
-            const result = JSON.parse(line);
-            if (result.result?.final) {
-              results.push(result);
-            }
-          } catch (error) {
-            console.warn('Failed to parse JSON:', error);
+        if (!line.trim()) {
+          continue;
+        }
+
+        try {
+          const result = JSON.parse(line);
+          if (result.result?.final) {
+            results.push(result);
           }
+        } catch (error) {
+          console.warn('Failed to parse JSON:', error);
         }
       }
     }
@@ -139,19 +130,15 @@ export class YandexSpeechKitAdapter implements SpeechToText {
         continue;
       }
 
-      for (const alternative of final.alternatives) {
-        if (
-          !alternative.text ||
-          !alternative.startTimeMs ||
-          !alternative.endTimeMs
-        ) {
+      for (const { text, startTimeMs, endTimeMs } of final.alternatives) {
+        if (!text || !startTimeMs || !endTimeMs) {
           continue;
         }
 
         segments.push({
-          start: Number.parseFloat(alternative.startTimeMs) / 1000,
-          end: Number.parseFloat(alternative.endTimeMs) / 1000,
-          text: alternative.text,
+          start: Number.parseFloat(startTimeMs) / 1000,
+          end: Number.parseFloat(endTimeMs) / 1000,
+          text,
         });
       }
     }
@@ -159,7 +146,14 @@ export class YandexSpeechKitAdapter implements SpeechToText {
     return new TranscriptionResult(segments);
   }
 
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  private makeClient(baseURL: string, apiKey: string): AxiosInstance {
+    return axios.create({
+      baseURL,
+      headers: {
+        Authorization: `Api-Key ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: HTTP_TIMEOUT.millis(),
+    });
   }
 }

@@ -1,7 +1,7 @@
 import type { FileSource, JobStatus } from '../core/models';
 import { TranscriptionJob } from '../core/models';
 import type { FileLoader, FileStorage, Notifier } from '../core/ports';
-import type { MergingService, PostprocessingService } from '../core/services';
+import type { PostprocessingService } from '../core/services';
 import {
   ConversionService,
   DownloadService,
@@ -14,7 +14,6 @@ export interface ActivityDeps {
   loaders: FileLoader[];
   storage: FileStorage;
   sttProviders: SpeechToText[];
-  mergingService: MergingService;
   postprocessor: PostprocessingService;
   notifier: Notifier;
 }
@@ -46,6 +45,13 @@ function jobFromDTO(dto: JobStateDTO): TranscriptionJob {
   );
   job.id = dto.id;
   job.paths = dto.paths;
+  // Ensure postprocessingPrompt path exists (for backward compatibility)
+  if (!job.paths.postprocessingPrompt) {
+    job.paths.postprocessingPrompt = job.paths.postprocessed.replace(
+      'postprocessed.txt',
+      'postprocessing_prompt.txt',
+    );
+  }
   job.status = dto.status;
   job.createdAt = new Date(dto.createdAt);
   job.updatedAt = new Date(dto.updatedAt);
@@ -107,16 +113,6 @@ export function buildActivities(deps: ActivityDeps) {
     async transcribe(jobDto: JobStateDTO): Promise<JobStateDTO> {
       const job = jobFromDTO(jobDto);
       await transcriptionService.transcribe(job);
-      return jobToDTO(job);
-    },
-
-    async merge(jobDto: JobStateDTO): Promise<JobStateDTO> {
-      const job = jobFromDTO(jobDto);
-      await deps.mergingService.merge(
-        job.paths.transcription1,
-        job.paths.transcription2,
-        job.paths.merged,
-      );
       return jobToDTO(job);
     },
 

@@ -10,6 +10,7 @@ export interface TranscriptionJobPaths {
   transcription2: string; // Salute
   merged: string;
   postprocessed: string;
+  postprocessingPrompt: string;
 }
 
 export class TranscriptionJob {
@@ -46,6 +47,7 @@ export class TranscriptionJob {
       transcription2: `${basePath}/transcription_salute.txt`,
       merged: `${basePath}/merged.txt`,
       postprocessed: `${basePath}/postprocessed.txt`,
+      postprocessingPrompt: `${basePath}/postprocessing_prompt.txt`,
     };
   }
 

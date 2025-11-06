@@ -13,7 +13,6 @@ const activities = proxyActivities<{
   download(job: JobStateDTO): Promise<JobStateDTO>;
   convert(job: JobStateDTO): Promise<JobStateDTO>;
   transcribe(job: JobStateDTO): Promise<JobStateDTO>;
-  merge(job: JobStateDTO): Promise<JobStateDTO>;
   postprocess(job: JobStateDTO): Promise<JobStateDTO>;
   sendResult(job: JobStateDTO): Promise<void>;
 }>({
@@ -62,13 +61,6 @@ export async function pipelineWorkflow(input: PipelineInput): Promise<void> {
   if (cancelled) {
     return;
   }
-  status = 'merging';
-  await activities.notify(
-    job.userId,
-    '🔀 Объединяются результаты распознавания...',
-  );
-  job = await activities.merge(job);
-
   if (cancelled) {
     return;
   }

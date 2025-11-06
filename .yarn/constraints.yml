@@ -4,12 +4,6 @@ typescript: 5.7.3
   jest: ^29.5.10
   node: 18.18.3
 
-"@rsdk":
-  '*': 6.0.0-next.14
-
-"@gosha":
-  '*': workspace:*
-
 "@nestjs":
   common: ^10.0.0
   core: ^10.0.0
@@ -26,8 +20,6 @@ grammy: ^1.37.0
 
 ioredis: ^5.4.1
 
-"@mcteam":
-  "*": "^2.5.0" 
 
 drizzle-orm: ^0.44.4
 zod: ^4.0.0
@@ -37,3 +29,10 @@ form-data: ^4.0.4
 
 '@speechkit':
   '*': workspace:*
+
+"@rsdk":
+  '*': 6.0.0-next.14
+
+"@mcteam":
+  "*": "^2.5.0" 
+"@mcteam/db.drizzle": workspace:*

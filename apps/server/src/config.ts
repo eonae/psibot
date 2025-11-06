@@ -14,7 +14,6 @@ export class Config {
     process.env.YC_SPEECH_KIT_BUCKET_NAME || 'speech-kit-wav';
 
   readonly SALUTE_SPEECH_AUTH_KEY = this.mustLoad('SALUTE_SPEECH_AUTH_KEY');
-  readonly SALUTE_SPEECH_CLIENT_ID = this.mustLoad('SALUTE_SPEECH_CLIENT_ID');
   readonly SALUTE_SPEECH_SCOPE = this.mustLoad('SALUTE_SPEECH_SCOPE');
 
   readonly OPENROUTER_API_KEY = this.mustLoad('OPENROUTER_API_KEY');
